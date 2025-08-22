@@ -1,55 +1,60 @@
 <?php
-namespace app\controllers;
+require_once __DIR__ . '/../core/Controller.php';
+require_once __DIR__ . '/../models/Athlete.php';
 
-use Yii;
-use yii\web\Controller;
-use app\models\Athlete;
-use app\models\Sport;
+class AthleteController extends Controller {
+    private $athleteModel;
 
-class AthleteController extends Controller
-{
-    // LIST all athletes
-    public function actionIndex()
-    {
-        $athletes = Athlete::find()
-            ->orderBy(['created_at' => SORT_DESC])
-            ->all();
-
-        return $this->render('index', [
-            'athletes' => $athletes,
-        ]);
+    public function __construct() {
+        $this->athleteModel = new Athlete();
     }
 
-    // REGISTER a new athlete (create)
-    public function actionCreate()
-    {
-        $model = new Athlete();
-        $sports = Sport::find()->orderBy(['name' => SORT_ASC])->all();
+    // Show list of IPC athletes
+    public function index() {
+        $athletes = $this->athleteModel->getAll();
+        $this->view('athlete/index', ['athletes' => $athletes]);
+    }
+
+    // Show registration form
+    public function create() {
+        $this->view('athlete/create', ['errors' => [], 'old' => []]);
+    }
+
+    // Handle Registration form submission
+    public function store() {
         $errors = [];
+        $data = [
+            'givenName' => trim($_POST['givenName'] ?? ''),
+            'familyName' => trim($_POST['familyName'] ?? ''),
+            'dateOfBirth' => trim($_POST['dateOfBirth'] ?? ''),
+            'sport' => trim($_POST['sport'] ?? ''),
+            'personalBestTime' => trim($_POST['personalBestTime'] ?? ''),
+        ];
 
-        if (Yii::$app->request->isPost) {
-            $data = Yii::$app->request->post('Athlete', []);
-
-            if ($model->manualValidate($data)) {
-                if (isset($GLOBALS['USER']) && isset($GLOBALS['USER']->id)) {
-                    $model->created_by = (int)$GLOBALS['USER']->id;
-                }
-                // Persist without built-in validation
-                if ($model->save(false)) {
-                    Yii::$app->session->setFlash('success', 'Athlete registered.');
-                    return $this->redirect(['index']);
-                } else {
-                    $errors['general'][] = 'Failed to save athlete due to a database error.';
-                }
-            } else {
-                $errors = $model->getErrorsBag();
-            }
+        // Manual validation of atleast 3 characters for names
+        if (strlen($data['givenName']) < 3) {
+            $errors['givenName'] = "Given name must be at least 3 characters.";
+        }
+        if (strlen($data['familyName']) < 3) {
+            $errors['familyName'] = "Family name must be at least 3 characters.";
+        }
+        // Age ≥ 12 manual validation from the date of registration
+        $dobTimestamp = strtotime($data['dateOfBirth']);
+        $age = (int)((time() - $dobTimestamp) / (365*24*60*60));
+        if ($age < 12) {
+            $errors['dateOfBirth'] = "Athlete must be at least 12 years old.";
+        }
+        // Time format hh:mm:ss
+        if (!preg_match('/^\d{1,2}:\d{2}:\d{2}$/', $data['personalBestTime'])) {
+            $errors['personalBestTime'] = "Time must be in hh:mm:ss format.";
         }
 
-        return $this->render('create', [
-            'model' => $model,
-            'sports' => $sports,
-            'errors' => $errors,
-        ]);
+        if (empty($errors)) {
+            $this->athleteModel->insert($data);
+            header("Location: /");
+            exit;
+        } else {
+            $this->view('athlete/create', ['errors' => $errors, 'old' => $data]);
+        }
     }
 }
