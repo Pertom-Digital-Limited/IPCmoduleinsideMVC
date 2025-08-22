@@ -1,6 +1,6 @@
 <?php
-require_once __DIR__ . '/../core/Controller.php';
-require_once __DIR__ . '/../models/Athlete.php';
+require_once __DIR__ . '/../core/controller.php';
+require_once __DIR__ . '/../models/athlete.php';
 
 class AthleteController extends Controller {
     private $athleteModel;
@@ -27,7 +27,7 @@ class AthleteController extends Controller {
             'givenName' => trim($_POST['givenName'] ?? ''),
             'familyName' => trim($_POST['familyName'] ?? ''),
             'dateOfBirth' => trim($_POST['dateOfBirth'] ?? ''),
-            'sport' => trim($_POST['sport'] ?? ''),
+            'sport_id' => trim($_POST['sport'] ?? ''),
             'personalBestTime' => trim($_POST['personalBestTime'] ?? ''),
         ];
 
@@ -49,10 +49,15 @@ class AthleteController extends Controller {
             $errors['personalBestTime'] = "Time must be in hh:mm:ss format.";
         }
 
-        if (empty($errors)) {
+       if (empty($errors)) {
+        try {
             $this->athleteModel->insert($data);
-            header("Location: /");
-            exit;
+            echo "✅ Athlete inserted successfully!"; // Debug
+            // header("Location: /ipc/index.php?controller=athlete&action=index");
+            // exit;
+        } catch (Exception $e) {
+            echo "❌ Insert failed: " . $e->getMessage();
+        }
         } else {
             $this->view('athlete/create', ['errors' => $errors, 'old' => $data]);
         }

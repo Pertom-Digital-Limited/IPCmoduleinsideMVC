@@ -5,7 +5,7 @@
 </head>
 <body>
     <h2>Register New Athlete</h2>
-    <form method="POST" action="/athlete/store">
+    <form method="POST" action="index.php?controller=athlete&action=create" method="post">
         <label>Given Name:</label><br>
         <input type="text" name="givenName" value="<?= htmlspecialchars($old['givenName'] ?? '') ?>">
         <span style="color:red;"><?= $errors['givenName'] ?? '' ?></span><br><br>
@@ -21,7 +21,12 @@
         <label>Sport:</label><br>
         <select name="sport">
             <?php
-            $sports = ['athletics track','swimming','cycling','triathlon'];
+            $sports = [
+        1 => 'athletics track',
+        2 => 'swimming',
+        3 => 'cycling',
+        4 => 'triathlon'
+    ];
             foreach ($sports as $sport):
                 $selected = (isset($old['sport']) && $old['sport'] == $sport) ? 'selected' : '';
             ?>
