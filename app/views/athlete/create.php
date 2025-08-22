@@ -1,74 +1,41 @@
-<?php
-/** @var app\models\Athlete $model */
-/** @var app\models\Sport[] $sports */
-/** @var array $errors */
-use yii\helpers\Html;
-use yii\helpers\Url;
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Register Athlete at International Paralympic Comnittee</title>
+</head>
+<body>
+    <h2>Register New Athlete</h2>
+    <form method="POST" action="/athlete/store">
+        <label>Given Name:</label><br>
+        <input type="text" name="givenName" value="<?= htmlspecialchars($old['givenName'] ?? '') ?>">
+        <span style="color:red;"><?= $errors['givenName'] ?? '' ?></span><br><br>
 
-function fieldErrors(array $errors, string $attr): string {
-    if (!isset($errors[$attr])) return '';
-    return '<ul class="text-danger" style="margin:4px 0 0 0;">'
-        . implode('', array_map(fn($e) => '<li>'.Html::encode($e).'</li>', $errors[$attr]))
-        . '</ul>';
-}
-?>
-<h1>Register IPC Athlete</h1>
+        <label>Family Name:</label><br>
+        <input type="text" name="familyName" value="<?= htmlspecialchars($old['familyName'] ?? '') ?>">
+        <span style="color:red;"><?= $errors['familyName'] ?? '' ?></span><br><br>
 
-<?php if (!empty($errors['general'])): ?>
-<div class="alert alert-danger">
-    <?php foreach ($errors['general'] as $e): ?>
-        <div><?= Html::encode($e) ?></div>
-    <?php endforeach; ?>
-</div>
-<?php endif; ?>
+        <label>Date of Birth:</label><br>
+        <input type="date" name="dateOfBirth" value="<?= htmlspecialchars($old['dateOfBirth'] ?? '') ?>">
+        <span style="color:red;"><?= $errors['dateOfBirth'] ?? '' ?></span><br><br>
 
-<form method="post" action="<?= Url::to(['athlete/create']) ?>">
-    <?= Html::hiddenInput(Yii::$app->request->csrfParam, Yii::$app->request->getCsrfToken()) ?>
-
-    <div class="mb-3">
-        <label class="form-label">Given Name</label>
-        <input type="text" name="Athlete[given_name]" class="form-control"
-               value="<?= Html::encode($model->given_name) ?>" />
-        <?= fieldErrors($errors, 'given_name') ?>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Family Name</label>
-        <input type="text" name="Athlete[family_name]" class="form-control"
-               value="<?= Html::encode($model->family_name) ?>" />
-        <?= fieldErrors($errors, 'family_name') ?>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Date of Birth (YYYY-MM-DD)</label>
-        <input type="text" name="Athlete[date_of_birth]" class="form-control"
-               placeholder="YYYY-MM-DD"
-               value="<?= Html::encode($model->date_of_birth) ?>" />
-        <?= fieldErrors($errors, 'date_of_birth') ?>
-    </div>
-
-    <div class="mb-3">
-        <label class="form-label">Sport</label>
-        <select name="Athlete[sport_id]" class="form-select">
-            <option value="">-- Select --</option>
-            <?php foreach ($sports as $s): ?>
-                <option value="<?= (int)$s->id ?>"
-                    <?= (int)$model->sport_id === (int)$s->id ? 'selected' : '' ?>>
-                    <?= Html::encode($s->name) ?>
-                </option>
+        <label>Sport:</label><br>
+        <select name="sport">
+            <?php
+            $sports = ['athletics track','swimming','cycling','triathlon'];
+            foreach ($sports as $sport):
+                $selected = (isset($old['sport']) && $old['sport'] == $sport) ? 'selected' : '';
+            ?>
+                <option value="<?= $sport ?>" <?= $selected ?>><?= ucfirst($sport) ?></option>
             <?php endforeach; ?>
-        </select>
-        <?= fieldErrors($errors, 'sport_id') ?>
-    </div>
+        </select><br><br>
 
-    <div class="mb-3">
-        <label class="form-label">Personal Best Time (hh:mm:ss)</label>
-        <input type="text" name="Athlete[personal_best_time]" class="form-control"
-               placeholder="hh:mm:ss"
-               value="<?= Html::encode($model->personal_best_time) ?>" />
-        <?= fieldErrors($errors, 'personal_best_time') ?>
-    </div>
+        <label>Personal Best Time (hh:mm:ss):</label><br>
+        <input type="text" name="personalBestTime" value="<?= htmlspecialchars($old['personalBestTime'] ?? '') ?>">
+        <span style="color:red;"><?= $errors['personalBestTime'] ?? '' ?></span><br><br>
 
-    <button type="submit" class="btn btn-success">Register</button>
-    <a href="<?= Url::to(['athlete/index']) ?>" class="btn btn-secondary">Cancel</a>
-</form>
+        <button type="submit">Register</button>
+    </form>
+    <br>
+    <a href="/">Back to Athlete List</a>
+</body>
+</html>
