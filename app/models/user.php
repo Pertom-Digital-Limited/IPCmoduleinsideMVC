@@ -1,21 +1,13 @@
 <?php
-namespace app\models;
+require_once __DIR__ . '/../core/Model.php';
 
-use yii\db\ActiveRecord;
+class User extends Model {
+    private $table = 'users';
 
-class User extends ActiveRecord
-{
-    public static function tableName() { return 'users'; }
-
-    // Simple role-based helpers
-    public function canView(): bool   { return in_array($this->role, ['admin','editor','viewer'], true); }
-    public function canCreate(): bool { return in_array($this->role, ['admin','editor'], true); }
-    public function canUpdate(): bool { return in_array($this->role, ['admin','editor'], true); }
-    public function canDelete(): bool { return $this->role === 'admin'; }
-
-    // Basic password check 
-    public function verifyPassword(string $plain): bool
-    {
-        return password_verify($plain, $this->password_hash);
+    // Basic user methods if needed
+    public function findByUsername($username) {
+        $stmt = $this->pdo->prepare("SELECT * FROM {$this->table} WHERE username = ?");
+        $stmt->execute([$username]);
+        return $stmt->fetch(PDO::FETCH_ASSOC);
     }
 }

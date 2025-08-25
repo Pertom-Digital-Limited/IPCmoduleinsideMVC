@@ -1,11 +1,11 @@
 <!DOCTYPE html>
 <html>
 <head>
-    <title>Register Athlete at International Paralympic Comnittee</title>
+    <title>Register Athlete at International Paralympic Committee</title>
 </head>
 <body>
-    <h2>Register New Athlete</h2>
-    <form method="POST" action="index.php?controller=athlete&action=create" method="post">
+    <h2>Register New IPC Athlete</h2>
+    <form method="POST" action="/ipctask1/index.php?controller=athlete&action=store">
         <label>Given Name:</label><br>
         <input type="text" name="givenName" value="<?= htmlspecialchars($old['givenName'] ?? '') ?>">
         <span style="color:red;"><?= $errors['givenName'] ?? '' ?></span><br><br>
@@ -19,20 +19,22 @@
         <span style="color:red;"><?= $errors['dateOfBirth'] ?? '' ?></span><br><br>
 
         <label>Sport:</label><br>
-        <select name="sport">
+        <select name="sport_id">
+            <option value="">-- choose --</option>
             <?php
             $sports = [
-        1 => 'athletics track',
-        2 => 'swimming',
-        3 => 'cycling',
-        4 => 'triathlon'
-    ];
-            foreach ($sports as $sport):
-                $selected = (isset($old['sport']) && $old['sport'] == $sport) ? 'selected' : '';
+                1 => 'athletics track',
+                2 => 'swimming', 
+                3 => 'cycling',
+                4 => 'triathlon'
+            ];
+            foreach ($sports as $id => $sportName):
+                $selected = (isset($old['sport_id']) && $old['sport_id'] == $id) ? 'selected' : '';
             ?>
-                <option value="<?= $sport ?>" <?= $selected ?>><?= ucfirst($sport) ?></option>
+                <option value="<?= $id ?>" <?= $selected ?>><?= ucfirst($sportName) ?></option>
             <?php endforeach; ?>
-        </select><br><br>
+        </select>
+        <span style="color:red;"><?= $errors['sport_id'] ?? '' ?></span><br><br>
 
         <label>Personal Best Time (hh:mm:ss):</label><br>
         <input type="text" name="personalBestTime" value="<?= htmlspecialchars($old['personalBestTime'] ?? '') ?>">
@@ -41,6 +43,6 @@
         <button type="submit">Register</button>
     </form>
     <br>
-    <a href="/">Back to Athlete List</a>
+    <a href="/ipctask1/index.php?controller=athlete&action=index">Back to Athlete List</a>
 </body>
 </html>

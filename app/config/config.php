@@ -7,7 +7,7 @@ return [
     'password' => '',           // default XAMPP password is empty
 
     // Application settings
-    'base_url' => 'http://localhost/ipc/' // adjust if folder name changes
+    'base_url' => 'http://localhost/ipctask1/' // adjust if folder name changes
 ];
 
 

@@ -4,34 +4,45 @@ require_once __DIR__ . '/../core/Model.php';
 class Athlete extends Model {
     private $table = 'athletes';
 
-    // Get all athletes
+    // Get all athletes with sport name
     public function getAll() {
-        $stmt = $this->pdo->query("SELECT * FROM {$this->table} ORDER BY id DESC");
-        return $stmt->fetchAll(PDO::FETCH_ASSOC);
-    }
+    $stmt = $this->pdo->query("
+        SELECT a.*, s.name as sport 
+        FROM {$this->table} a 
+        LEFT JOIN sports s ON a.sport_id = s.id 
+        ORDER BY a.id DESC
+    ");
+    return $stmt->fetchAll(PDO::FETCH_ASSOC);
+}
 
-    // Insert new athlete into the database
-public function insert($data) {
+    // Insert new athlete
+    public function insert(array $data) {
     try {
-        $stmt = $this->pdo->prepare("
-            INSERT INTO {$this->table} 
-            (givenName, familyName, dateOfBirth, sports_id, personalBestTime)
-            VALUES (:givenName, :familyName, :dateOfBirth, :sports_id, :personalBestTime)
-        ");
+        $sql = "
+            INSERT INTO {$this->table}
+            (givenName, familyName, dateOfBirth, sport_id, personalBestTime, created_by)
+            VALUES (
+                :givenName,
+                :familyName,
+                :dateOfBirth,
+                :sport_id,
+                :personalBestTime,
+                NULL
+            )
+        ";
 
+        $stmt = $this->pdo->prepare($sql);
         $stmt->execute([
-            ':givenName' => $data['givenName'],
-            ':familyName' => $data['familyName'],
-            ':dateOfBirth' => $data['dateOfBirth'],
-            ':sports_id' => $data['sport_id'],   // notice we renamed this
+            ':givenName'        => $data['givenName'],
+            ':familyName'       => $data['familyName'],
+            ':dateOfBirth'      => $data['dateOfBirth'],
+            ':sport_id'         => (int)$data['sport_id'],
             ':personalBestTime' => $data['personalBestTime'],
         ]);
 
+        return $this->pdo->lastInsertId();
     } catch (PDOException $e) {
-        echo "Database insert error: " . $e->getMessage();
-        exit;
+        throw new Exception("Database insert error: " . $e->getMessage());
     }
 }
 }
-
-

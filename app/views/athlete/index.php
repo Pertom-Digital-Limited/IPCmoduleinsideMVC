@@ -5,7 +5,8 @@
 </head>
 <body>
     <h2>Registered Athletes</h2>
-    <a href="/athlete/create">Register New Athlete</a>
+    <a href="/ipctask1/index.php?controller=athlete&action=create">Register New Athlete</a>
+    <br><br>
     <table border="1" cellpadding="5" cellspacing="0">
         <thead>
             <tr>
